@@ -100,6 +100,11 @@ function setColours() {
     row.sort((a, b) => (a.x_pos - b.x_pos));
   });
 
+  console.log("flamegraphBoxHeight = " + flamegraphBoxHeight);
+  console.log("nodes_by_depth.length = " + nodes_by_depth.length);
+  overallFlamegraphCanvasHeight = (nodes_by_depth.length -1) * flamegraphBoxHeight;
+  console.log("overallFlamegraphCanvasHeight = " + overallFlamegraphCanvasHeight);
+
   function nextColour() {
     colour_index++;
     colour_index = colour_index % colours.length;
@@ -116,6 +121,7 @@ function setColours() {
       }
     });
   });
+
 }
 
 let currentSelection = null;
@@ -131,6 +137,9 @@ function drawFlameGraph(function_calls) {
 
   let rectSelection = svg.selectAll('rect')
       .data(function_calls);
+
+  console.log("Setting canvas height to " + overallFlamegraphCanvasHeight)
+  svg.attr('height', overallFlamegraphCanvasHeight);
 
   // Only update x and width on update, labels never change.
   // rectSelection
@@ -148,7 +157,7 @@ function drawFlameGraph(function_calls) {
         return d.x_pos;
       }
     })
-    .attr('y', (d, _i) => (flamegraphCanvasHeight - d.height) - d.y_pos)
+    .attr('y', (d, _i) => (overallFlamegraphCanvasHeight - d.height) - d.y_pos)
     .attr('width', (d, _i) => {
       if (isNaN(d.width)) {
         console.error('NaN width for ' + d.name);
@@ -241,6 +250,7 @@ function createStack(node) {
 let flamegraphCanvasWidth;
 let flamegraphProfileWidth;
 let flamegraphCanvasHeight;
+let overallFlamegraphCanvasHeight;
 let flamegraphBoxHeight;
 
 function refreshFlameGraph() {
@@ -298,7 +308,7 @@ function resizeFlameGraph() {
   flamegraphBoxHeight = 20;
 
   svg.attr('width', flamegraphCanvasWidth)
-    .attr('height', flamegraphCanvasHeight);
+    .attr('height', overallFlamegraphCanvasHeight);
 
   details.attr('width', flamegraphProfileWidth)
     .attr('height', flamegraphCanvasHeight);
