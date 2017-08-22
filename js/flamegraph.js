@@ -100,10 +100,14 @@ function setColours() {
     row.sort((a, b) => (a.x_pos - b.x_pos));
   });
 
-  console.log("flamegraphBoxHeight = " + flamegraphBoxHeight);
   console.log("nodes_by_depth.length = " + nodes_by_depth.length);
-  overallFlamegraphCanvasHeight = (nodes_by_depth.length -1) * flamegraphBoxHeight;
-  console.log("overallFlamegraphCanvasHeight = " + overallFlamegraphCanvasHeight);
+  var heightNeeded = nodes_by_depth.length * flamegraphBoxHeight;
+  if(heightNeeded > flamegraphMinCanvasHeight) {
+      flamegraphCanvasHeight = heightNeeded;
+  } else {
+      flamegraphCanvasHeight = flamegraphMinCanvasHeight;
+  }
+  console.log("flamegraphCanvasHeight = " + flamegraphCanvasHeight);
 
   function nextColour() {
     colour_index++;
@@ -138,8 +142,8 @@ function drawFlameGraph(function_calls) {
   let rectSelection = svg.selectAll('rect')
       .data(function_calls);
 
-  console.log("Setting canvas height to " + overallFlamegraphCanvasHeight)
-  svg.attr('height', overallFlamegraphCanvasHeight);
+  console.log("Setting canvas height to " + flamegraphCanvasHeight)
+  svg.attr('height', flamegraphCanvasHeight);
 
   // Only update x and width on update, labels never change.
   // rectSelection
@@ -157,7 +161,7 @@ function drawFlameGraph(function_calls) {
         return d.x_pos;
       }
     })
-    .attr('y', (d, _i) => (overallFlamegraphCanvasHeight - d.height) - d.y_pos)
+    .attr('y', (d, _i) => (flamegraphCanvasHeight - d.height) - d.y_pos)
     .attr('width', (d, _i) => {
       if (isNaN(d.width)) {
         console.error('NaN width for ' + d.name);
@@ -196,7 +200,7 @@ function drawFlameGraph(function_calls) {
   //   .enter()
   //   .append("text")
   //   .attr("x", (d, i) => {if( isNaN(d.x_pos) ) { console.error("NaN x_pos for " + d.name) } else { return d.x_pos}})
-  //   .attr("y", (d, i) => (flamegraphCanvasHeight - (d.height/2)) - d.y_pos)
+  //   .attr("y", (d, i) => (flamegraphMinCanvasHeight - (d.height/2)) - d.y_pos)
   //   .attr("width", (d, i) => {if( isNaN(d.width) ) { console.error("NaN width for " + d.name) } else {return d.width}})
   //   .attr("height", (d, i) => d.height)
   //   .text((d, i)=> d.name)
@@ -249,28 +253,34 @@ function createStack(node) {
 
 let flamegraphCanvasWidth;
 let flamegraphProfileWidth;
+let flamegraphMinCanvasHeight;
 let flamegraphCanvasHeight;
-let overallFlamegraphCanvasHeight;
 let flamegraphBoxHeight;
 
 function refreshFlameGraph() {
   // The first node should always be the root node.
   updateNodeAndChildren(all_tree_nodes[0], flamegraphCanvasWidth);
   drawFlameGraph(all_tree_nodes);
+  // Re-select the selected node if there is one
+  if(currentSelection) {
+      d3.select(currentSelection)
+        .style('stroke-width', 3)
+        .style('stroke', 'rgb(0,0,0)');
+    }
 }
 
 let svg = window.d3.select('#flameDiv')
   .append('svg')
   .attr('class', 'flameGraph')
   .attr('width', flamegraphCanvasWidth)
-  .attr('height', flamegraphCanvasHeight);
+  .attr('height', flamegraphMinCanvasHeight);
 
 // Create a details pane the same size as the flamegraph.
 let details = window.d3.select('#flameDiv')
     .append('svg')
     .attr('class', 'callStack')
     .attr('width', flamegraphProfileWidth)
-    .attr('height', flamegraphCanvasHeight);
+    .attr('height', flamegraphMinCanvasHeight);
 
 // Draw the title box
 details.append('rect')
@@ -291,7 +301,7 @@ let detailsText = details.append('text')
   .attr('x', 0)
   .attr('y', 50)
   .attr('width', '100%')
-  .attr('height', flamegraphCanvasHeight - 50)
+  .attr('height', flamegraphMinCanvasHeight - 50)
   .attr('text-anchor', 'left')
   .style('font-size', '18px')
   .style('font-family', 'monospace');
@@ -304,11 +314,11 @@ function resizeFlameGraph() {
   let profilingTabWidth = $('#flameDiv').width() - 8;
   flamegraphCanvasWidth = profilingTabWidth * 0.6;
   flamegraphProfileWidth = profilingTabWidth * 0.35; // Leave 0.05 for padding.
-  flamegraphCanvasHeight = window.innerHeight - 120;
+  flamegraphMinCanvasHeight = window.innerHeight - 120;
   flamegraphBoxHeight = 20;
 
   svg.attr('width', flamegraphCanvasWidth)
-    .attr('height', overallFlamegraphCanvasHeight);
+    .attr('height', flamegraphCanvasHeight);
 
   details.attr('width', flamegraphProfileWidth)
     .attr('height', flamegraphCanvasHeight);
