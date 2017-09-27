@@ -108,7 +108,8 @@ function updateHttpData(httpRequest) {
     // Send data to throughput chart so as not to duplicate requests
     // define as global for eslint purposes
     /* global updateThroughPutData:false */
-    updateThroughPutData(httpRequestData);
+    if(typeof updateThroughPutData === "function")
+      updateThroughPutData(httpRequestData);
     if (httpLength === 0) {
       // first data - remove "No Data Available" label
       httpChartPlaceholder.attr('visibility', 'hidden');

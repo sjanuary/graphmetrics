@@ -139,7 +139,7 @@ mempoolsChart.append('text')
     .attr('y', 15 - margin.top)
     .attr('dominant-baseline', 'central')
     .style('font-size', '18px')
-    .text('Heap');
+    .text('Java Heap Memory');
 
 // Add the placeholder text
 var mempoolsChartPlaceholder = mempoolsChart.append('text')
@@ -163,7 +163,7 @@ var mempoolsUsedLabel = mempoolsChart.append('text')
     .attr('y', graphHeight + margin.bottom - 5)
     .attr('text-anchor', 'start')
     .attr('class', 'lineLabel')
-    .text('Used Heap Memory');
+    .text('Used Heap');
 
 // Add the total used colour box
 mempoolsChart.append('rect')

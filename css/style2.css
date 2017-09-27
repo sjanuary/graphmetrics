@@ -116,9 +116,14 @@
 
     .cpuChart path,
     .memChart path,
+    .swift_cpuChart path,
+    .java_cpuChart path,
+    .swift_memChart path,
     .gcChart path,
     .elChart path,
     .httpThroughPutChart path,
+    .swift_httpChart path,
+    .java_httpChart path,
     .httpChart path {
         stroke: #00b4a0;
         stroke-width: 2;
@@ -142,6 +147,8 @@
 
     path.line3,
     path.httpline,
+    path.java_httpline,
+    path.swift_httpline,
     path.totalUsedLine {
         stroke: #5aaafa;
         stroke-width: 2;
